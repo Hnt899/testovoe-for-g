@@ -30,7 +30,7 @@ const newsItems = [
 ];
 
 export const NewsFeed = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
@@ -43,16 +43,20 @@ export const NewsFeed = () => {
     return 4;
   };
 
-  const [visibleCards, setVisibleCards] = useState(getVisibleCards());
-
-  const maxIndex = Math.max(0, newsItems.length - visibleCards);
-
   const nextSlide = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
+    if (activeIndex === null) {
+      setActiveIndex(0);
+    } else {
+      setActiveIndex((prev) => ((prev || 0) + 1) % newsItems.length);
+    }
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => Math.max(prev - 1, 0));
+    if (activeIndex === null) {
+      setActiveIndex(newsItems.length - 1);
+    } else {
+      setActiveIndex((prev) => ((prev || 0) - 1 + newsItems.length) % newsItems.length);
+    }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -86,18 +90,17 @@ export const NewsFeed = () => {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            <div
-              className="flex transition-transform duration-300 ease-out gap-6"
-              style={{
-                transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
-              }}
-            >
-              {newsItems.map((item) => (
+            <div className="flex justify-center gap-6 flex-wrap">
+              {newsItems.map((item, index) => (
                 <div
                   key={item.id}
-                  className="flex-shrink-0 w-full md:w-[calc(50%-12px)] lg:w-[calc(25%-18px)]"
+                  className={`transition-all duration-500 ease-out ${
+                    activeIndex === index
+                      ? "w-full md:w-[calc(40%-12px)] scale-105"
+                      : "w-full md:w-[calc(30%-12px)] scale-100"
+                  }`}
                 >
-                  <div className="bg-card rounded-lg overflow-hidden card-shadow hover-lift h-full flex flex-col">
+                  <div className="bg-card rounded-lg overflow-hidden card-shadow h-full flex flex-col">
                     <div className="h-48 overflow-hidden">
                       <img
                         src={item.image}
@@ -110,6 +113,11 @@ export const NewsFeed = () => {
                       <h3 className="text-lg font-semibold mb-4 flex-grow text-foreground">
                         {item.title}
                       </h3>
+                      {activeIndex === index && (
+                        <p className="text-muted-foreground text-sm mb-4 animate-fade-in">
+                          Подробная информация о данной статье. Узнайте больше о последних новостях и событиях.
+                        </p>
+                      )}
                       <Button
                         variant="outline"
                         className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
@@ -124,41 +132,22 @@ export const NewsFeed = () => {
           </div>
 
           {/* Navigation Arrows */}
-          {currentIndex > 0 && (
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-background"
-              onClick={prevSlide}
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
-          )}
-          {currentIndex < maxIndex && (
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-background"
-              onClick={nextSlide}
-            >
-              <ChevronRight className="h-6 w-6" />
-            </Button>
-          )}
-        </div>
-
-        {/* Dots Indicator for Mobile */}
-        <div className="flex justify-center gap-2 mt-8 md:hidden">
-          {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-            <button
-              key={index}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentIndex
-                  ? "bg-primary w-8"
-                  : "bg-muted-foreground/30"
-              }`}
-              onClick={() => setCurrentIndex(index)}
-            />
-          ))}
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-background z-10"
+            onClick={prevSlide}
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-background z-10"
+            onClick={nextSlide}
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
         </div>
       </div>
     </section>
