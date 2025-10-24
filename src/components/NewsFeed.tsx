@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { TouchEvent } from "react";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import news1 from "@/assets/news-1.jpg";
@@ -69,12 +70,12 @@ export const NewsFeed = () => {
     setTouchStart(0);
     setTouchEnd(0);
   };
-
   const clearActiveIfFocusLeaves = (
     element: HTMLElement | null,
     relatedTarget: EventTarget | null,
   ) => {
     if (!element?.contains(relatedTarget as Node | null)) {
+
       setActiveIndex(null);
     }
   };
@@ -99,6 +100,7 @@ export const NewsFeed = () => {
         onBlur={(event) => {
           clearActiveIfFocusLeaves(event.currentTarget, event.relatedTarget);
         }}
+
       >
         <div
           className={`rounded-2xl overflow-hidden h-full flex flex-col shadow-[var(--shadow-card)] transition-all duration-500 ${
