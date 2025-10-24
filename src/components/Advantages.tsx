@@ -77,7 +77,8 @@ export const Advantages = () => {
 
   return (
     <section id="advantages" className="py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden">
-      <div className="container mx-auto px-4">
+
+      <div className="container mx-auto px-4 md:px-8">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-primary">
           Наши ценности скажут о нас больше
         </h2>
@@ -85,30 +86,34 @@ export const Advantages = () => {
           Присмотрись к тому, что для нас важно, и узнай команду лучше через наши принципы.
         </p>
 
-        <div ref={scrollRef} className="flex gap-8 md:gap-10 overflow-x-hidden pb-4">
-          {[...advantages, ...advantages].map((advantage, index) => (
-            <div
-              key={`${advantage.id}-${index}`}
-              className="flex-shrink-0 w-72 sm:w-80 md:w-[20rem]"
-            >
-              <div className="bg-card/80 backdrop-blur-sm rounded-3xl px-6 py-8 h-full flex flex-col items-center md:items-start text-center md:text-left shadow-[var(--shadow-card)] transition-transform duration-500 ease-out">
-                <div className="w-44 h-44 md:w-52 md:h-52 mb-6 flex items-center justify-center">
-                  <img
-                    src={advantage.image}
-                    alt={advantage.title}
-                    className="w-full h-full object-contain drop-shadow-lg"
-                    loading="lazy"
-                  />
+        <div className="relative -mx-8 sm:-mx-16 lg:-mx-24">
+          <div className="pl-8 sm:pl-16 lg:pl-24 pr-8 sm:pr-16 lg:pr-24">
+            <div ref={scrollRef} className="flex gap-8 md:gap-10 overflow-x-hidden pb-4">
+              {[...advantages, ...advantages].map((advantage, index) => (
+                <div
+                  key={`${advantage.id}-${index}`}
+                  className="flex-shrink-0 w-[20rem] sm:w-[22rem] md:w-[23rem]"
+                >
+                  <div className="bg-card/80 backdrop-blur-sm rounded-3xl px-6 py-8 h-full flex flex-col items-center md:items-start text-center md:text-left shadow-[var(--shadow-card)] transition-transform duration-500 ease-out">
+                    <div className="w-full h-48 md:h-56 mb-6 flex items-center justify-center">
+                      <img
+                        src={advantage.image}
+                        alt={advantage.title}
+                        className="w-full h-full object-contain drop-shadow-lg"
+                        loading="lazy"
+                      />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4 text-foreground leading-snug">
+                      {advantage.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed text-base">
+                      {advantage.description}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-foreground leading-snug">
-                  {advantage.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed text-base">
-                  {advantage.description}
-                </p>
-              </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

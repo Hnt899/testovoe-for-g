@@ -36,19 +36,21 @@ export const NewsFeed = () => {
   const [touchEnd, setTouchEnd] = useState(0);
 
   const nextSlide = () => {
-    if (activeIndex === null) {
-      setActiveIndex(0);
-    } else {
-      setActiveIndex((prev) => ((prev || 0) + 1) % newsItems.length);
-    }
+    setActiveIndex((prev) => {
+      if (prev === null) {
+        return 0;
+      }
+      return (prev + 1) % newsItems.length;
+    });
   };
 
   const prevSlide = () => {
-    if (activeIndex === null) {
-      setActiveIndex(newsItems.length - 1);
-    } else {
-      setActiveIndex((prev) => ((prev || 0) - 1 + newsItems.length) % newsItems.length);
-    }
+    setActiveIndex((prev) => {
+      if (prev === null) {
+        return newsItems.length - 1;
+      }
+      return (prev - 1 + newsItems.length) % newsItems.length;
+    });
   };
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
@@ -103,9 +105,8 @@ export const NewsFeed = () => {
                     isActive ? "-translate-y-1.5" : "translate-y-0"
                   }`}
                   tabIndex={0}
-                  onMouseEnter={() => setActiveIndex(index)}
+                  onClick={() => setActiveIndex((prev) => (prev === index ? null : index))}
                   onFocus={() => setActiveIndex(index)}
-                  onMouseLeave={() => setActiveIndex(null)}
                   onBlur={handleArticleBlur}
                 >
                   <div
@@ -113,11 +114,11 @@ export const NewsFeed = () => {
                       isActive ? "ring-2 ring-primary shadow-lg" : "ring-1 ring-transparent"
                     }`}
                   >
-                    <div className="h-44 overflow-hidden">
+                    <div className="h-52 overflow-hidden">
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 group-focus-visible:scale-105"
                         loading="lazy"
                       />
                     </div>
@@ -126,9 +127,10 @@ export const NewsFeed = () => {
                         {item.title}
                       </h3>
                       <div
-                        className={`text-muted-foreground text-sm transition-[max-height,opacity] duration-500 ease-out overflow-hidden ${
-                          isActive ? "max-h-24 opacity-100 mt-3" : "max-h-0 opacity-0"
+                        className={`text-muted-foreground text-sm transition-opacity duration-500 ease-out min-h-[88px] ${
+                          isActive ? "opacity-100 mt-3" : "opacity-0"
                         }`}
+                        aria-hidden={!isActive}
                       >
                         Подробная информация о данной статье. Узнайте больше о последних новостях и событиях.
                       </div>
@@ -152,7 +154,7 @@ export const NewsFeed = () => {
             variant="outline"
             size="icon"
             aria-label="Показать предыдущую новость"
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-background z-10"
+            className="absolute left-[-3.5rem] top-1/2 -translate-y-1/2 bg-background z-10"
             onClick={prevSlide}
           >
             <ChevronLeft className="h-6 w-6" />
@@ -161,7 +163,7 @@ export const NewsFeed = () => {
             variant="outline"
             size="icon"
             aria-label="Показать следующую новость"
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-background z-10"
+            className="absolute right-[-3.5rem] top-1/2 -translate-y-1/2 bg-background z-10"
             onClick={nextSlide}
           >
             <ChevronRight className="h-6 w-6" />
