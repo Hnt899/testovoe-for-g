@@ -77,7 +77,6 @@ export const Advantages = () => {
 
   return (
     <section id="advantages" className="py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden">
-
       <div className="container mx-auto px-4 md:px-8">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-primary">
           Наши ценности скажут о нас больше

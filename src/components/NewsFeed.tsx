@@ -32,25 +32,23 @@ const newsItems = [
 
 export const NewsFeed = () => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
+  const goToIndex = (index: number) => {
+    setCurrentIndex(index);
+    setActiveIndex(index);
+  };
+
   const nextSlide = () => {
-    setActiveIndex((prev) => {
-      if (prev === null) {
-        return 0;
-      }
-      return (prev + 1) % newsItems.length;
-    });
+    const next = (currentIndex + 1) % newsItems.length;
+    goToIndex(next);
   };
 
   const prevSlide = () => {
-    setActiveIndex((prev) => {
-      if (prev === null) {
-        return newsItems.length - 1;
-      }
-      return (prev - 1 + newsItems.length) % newsItems.length;
-    });
+    const prev = (currentIndex - 1 + newsItems.length) % newsItems.length;
+    goToIndex(prev);
   };
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
@@ -68,6 +66,81 @@ export const NewsFeed = () => {
     if (touchStart - touchEnd < -50) {
       prevSlide();
     }
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
+
+  const handleArticleBlur = (event: FocusEvent<HTMLElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setActiveIndex(null);
+    }
+  };
+
+  const handleButtonBlur = (event: FocusEvent<HTMLButtonElement>) => {
+    if (!event.currentTarget.parentElement?.contains(event.relatedTarget as Node | null)) {
+      setActiveIndex(null);
+    }
+  };
+
+  const renderCard = (item: (typeof newsItems)[number], index: number) => {
+    const isActive = activeIndex === index;
+    return (
+      <article
+        key={item.id}
+        className={`group h-full transition-transform duration-500 ease-out ${
+          isActive ? "-translate-y-1.5" : "translate-y-0"
+        }`}
+        tabIndex={0}
+        onClick={() => {
+          setCurrentIndex(index);
+          setActiveIndex((prev) => (prev === index ? null : index));
+        }}
+        onFocus={() => {
+          setCurrentIndex(index);
+          setActiveIndex(index);
+        }}
+        onBlur={handleArticleBlur}
+      >
+        <div
+          className={`rounded-2xl overflow-hidden h-full flex flex-col shadow-[var(--shadow-card)] transition-all duration-500 ${
+            isActive ? "ring-2 ring-primary shadow-lg" : "ring-1 ring-transparent"
+          }`}
+        >
+          <div className="h-52 overflow-hidden">
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 group-focus-visible:scale-105"
+              loading="lazy"
+            />
+          </div>
+          <div className="p-6 flex flex-col flex-1">
+            <h3 className="text-lg font-semibold text-foreground leading-snug flex-1">
+              {item.title}
+            </h3>
+            <div
+              className={`text-muted-foreground text-sm transition-opacity duration-500 ease-out min-h-[88px] ${
+                isActive ? "opacity-100 mt-3" : "opacity-0"
+              }`}
+              aria-hidden={!isActive}
+            >
+              Подробная информация о данной статье. Узнайте больше о последних новостях и событиях.
+            </div>
+            <Button
+              variant="outline"
+              className="mt-6 w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              onFocus={() => {
+                setCurrentIndex(index);
+                setActiveIndex(index);
+              }}
+              onBlur={handleButtonBlur}
+            >
+              Перейти к статье
+            </Button>
+          </div>
+        </div>
+      </article>
+    );
   };
 
   const handleArticleBlur = (event: FocusEvent<HTMLElement>) => {
@@ -91,62 +164,27 @@ export const NewsFeed = () => {
 
         <div className="relative">
           <div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            className="md:hidden"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            {newsItems.map((item, index) => {
-              const isActive = activeIndex === index;
-              return (
-                <article
-                  key={item.id}
-                  className={`group h-full transition-transform duration-500 ease-out ${
-                    isActive ? "-translate-y-1.5" : "translate-y-0"
-                  }`}
-                  tabIndex={0}
-                  onClick={() => setActiveIndex((prev) => (prev === index ? null : index))}
-                  onFocus={() => setActiveIndex(index)}
-                  onBlur={handleArticleBlur}
-                >
-                  <div
-                    className={`rounded-2xl overflow-hidden h-full flex flex-col shadow-[var(--shadow-card)] transition-all duration-500 ${
-                      isActive ? "ring-2 ring-primary shadow-lg" : "ring-1 ring-transparent"
-                    }`}
-                  >
-                    <div className="h-52 overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 group-focus-visible:scale-105"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="p-6 flex flex-col flex-1">
-                      <h3 className="text-lg font-semibold text-foreground leading-snug flex-1">
-                        {item.title}
-                      </h3>
-                      <div
-                        className={`text-muted-foreground text-sm transition-opacity duration-500 ease-out min-h-[88px] ${
-                          isActive ? "opacity-100 mt-3" : "opacity-0"
-                        }`}
-                        aria-hidden={!isActive}
-                      >
-                        Подробная информация о данной статье. Узнайте больше о последних новостях и событиях.
-                      </div>
-                      <Button
-                        variant="outline"
-                        className="mt-6 w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                        onFocus={() => setActiveIndex(index)}
-                        onBlur={handleButtonBlur}
-                      >
-                        Перейти к статье
-                      </Button>
-                    </div>
+            <div className="overflow-hidden">
+              <div
+                className="flex transition-transform duration-500 ease-out"
+                style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+              >
+                {newsItems.map((item, index) => (
+                  <div key={item.id} className="w-full flex-shrink-0 px-1">
+                    {renderCard(item, index)}
                   </div>
-                </article>
-              );
-            })}
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {newsItems.map((item, index) => renderCard(item, index))}
           </div>
 
           {/* Navigation Arrows */}
@@ -154,7 +192,7 @@ export const NewsFeed = () => {
             variant="outline"
             size="icon"
             aria-label="Показать предыдущую новость"
-            className="absolute left-[-3.5rem] top-1/2 -translate-y-1/2 bg-background z-10"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-background z-10 shadow md:left-[-3.5rem]"
             onClick={prevSlide}
           >
             <ChevronLeft className="h-6 w-6" />
@@ -163,7 +201,7 @@ export const NewsFeed = () => {
             variant="outline"
             size="icon"
             aria-label="Показать следующую новость"
-            className="absolute right-[-3.5rem] top-1/2 -translate-y-1/2 bg-background z-10"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-background z-10 shadow md:right-[-3.5rem]"
             onClick={nextSlide}
           >
             <ChevronRight className="h-6 w-6" />
