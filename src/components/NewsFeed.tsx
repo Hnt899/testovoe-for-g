@@ -143,6 +143,18 @@ export const NewsFeed = () => {
     );
   };
 
+  const handleArticleBlur = (event: FocusEvent<HTMLElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setActiveIndex(null);
+    }
+  };
+
+  const handleButtonBlur = (event: FocusEvent<HTMLButtonElement>) => {
+    if (!event.currentTarget.parentElement?.contains(event.relatedTarget as Node | null)) {
+      setActiveIndex(null);
+    }
+  };
+
   return (
     <section className="py-20 bg-gradient-to-b from-background to-muted/30">
       <div className="container mx-auto px-4">
