@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import heroOffice from "@/assets/hero-office.jpg";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = [
@@ -140,9 +141,17 @@ export const InterviewForm = () => {
   return (
     <section
       id="interview-form"
-      className="py-20 bg-gradient-to-b from-muted/30 to-primary/10"
+      className="relative py-20 overflow-hidden"
     >
-      <div className="container mx-auto px-4 max-w-2xl">
+      <div className="absolute inset-0">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${heroOffice})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-primary/60 to-transparent" />
+        <div className="absolute inset-0 backdrop-blur-sm" />
+      </div>
+      <div className="relative container mx-auto px-4 max-w-2xl">
         <div className="bg-primary rounded-lg p-8 md:p-12 card-shadow">
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-8">
             Записаться на собеседование
