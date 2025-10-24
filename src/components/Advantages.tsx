@@ -42,62 +42,71 @@ export const Advantages = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
+    const container = scrollRef.current;
+    if (!container) return;
 
-    let scrollAmount = 0;
-    const scrollSpeed = 0.5;
+    let animationFrameId: number;
+    let lastTimestamp: number | null = null;
+    let scrollPosition = container.scrollLeft;
 
-    const animateScroll = () => {
-      if (scrollContainer) {
-        scrollAmount += scrollSpeed;
-        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-        
-        if (scrollAmount >= maxScroll) {
-          scrollAmount = 0;
-        }
-        
-        scrollContainer.scrollLeft = scrollAmount;
+    const step = (timestamp: number) => {
+      if (!container) return;
+
+      if (lastTimestamp === null) {
+        lastTimestamp = timestamp;
       }
-      requestAnimationFrame(animateScroll);
+
+      const delta = timestamp - lastTimestamp;
+      lastTimestamp = timestamp;
+
+      const maxScroll = container.scrollWidth - container.clientWidth;
+
+      if (maxScroll > 0) {
+        const pixelsPerMillisecond = 0.08;
+        scrollPosition = (scrollPosition + pixelsPerMillisecond * delta) % maxScroll;
+        container.scrollLeft = scrollPosition;
+      }
+
+      animationFrameId = requestAnimationFrame(step);
     };
 
-    const animation = requestAnimationFrame(animateScroll);
-    
-    return () => cancelAnimationFrame(animation);
+    animationFrameId = requestAnimationFrame(step);
+
+    return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
   return (
     <section id="advantages" className="py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-primary">
-          Наши ценности скажут о нас больше:
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-primary">
+          Наши ценности скажут о нас больше
         </h2>
+        <p className="text-center text-muted-foreground max-w-3xl mx-auto mb-12 text-base md:text-lg">
+          Присмотрись к тому, что для нас важно, и узнай команду лучше через наши принципы.
+        </p>
 
-        <div 
-          ref={scrollRef}
-          className="flex gap-8 overflow-x-hidden"
-          style={{ scrollBehavior: 'auto' }}
-        >
+        <div ref={scrollRef} className="flex gap-8 md:gap-10 overflow-x-hidden pb-4">
           {[...advantages, ...advantages].map((advantage, index) => (
             <div
               key={`${advantage.id}-${index}`}
-              className="flex-shrink-0 w-64 text-center"
+              className="flex-shrink-0 w-72 sm:w-80 md:w-[20rem]"
             >
-              <div className="w-full h-48 mb-4 flex items-center justify-center">
-                <img
-                  src={advantage.image}
-                  alt={advantage.title}
-                  className="w-full h-full object-contain"
-                  loading="lazy"
-                />
+              <div className="bg-card/80 backdrop-blur-sm rounded-3xl px-6 py-8 h-full flex flex-col items-center md:items-start text-center md:text-left shadow-[var(--shadow-card)] transition-transform duration-500 ease-out">
+                <div className="w-44 h-44 md:w-52 md:h-52 mb-6 flex items-center justify-center">
+                  <img
+                    src={advantage.image}
+                    alt={advantage.title}
+                    className="w-full h-full object-contain drop-shadow-lg"
+                    loading="lazy"
+                  />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-foreground leading-snug">
+                  {advantage.title}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed text-base">
+                  {advantage.description}
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-2 text-foreground">
-                {advantage.title}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed text-sm">
-                {advantage.description}
-              </p>
             </div>
           ))}
         </div>
